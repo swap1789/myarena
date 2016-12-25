@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=Windows-1252">
+		<title>Dynamic Table with sort and filters</title>
+		<style type="text/css">
+
+		</style>
+	</head>
+	<body>
+		<div id="wrapper">
+		<input type="text" id="filterTable" placeholder="Filter Data..." />
+			<table id="tableData">
+				<tr>
+				<th>Id</th>
+				<th onclick="myCustomObject.sort_table(dummyTable, 0, asc1); asc1 *= -1; asc2 = 1; asc3 = 1;">Name</th>
+                <th onclick="myCustomObject.sort_table(dummyTable, 1, asc2); asc2 *= -1; asc3 = 1; asc1 = 1;">Author</th>
+                <th onclick="myCustomObject.sort_table(dummyTable, 2, asc3); asc3 *= -1; asc1 = 1; asc2 = 1;">Published Year</th>
+				</tr>
+				<tbody id="tableBody">
+
+				</tbody>
+			</table>
+
+		</div><!--wrapper ends here-->
+
+		<script type="text/javascript">
+
+		 var dummyTable, asc1 = 1,
+             asc2 = 1,
+             asc3 = 1;
+
+        window.onload = function(){
+        	var myTable = document.createElement('table');
+			document.getElementById('wrapper').appendChild(myTable);
+			dummyTable = document.getElementById("tableBody");
+			myCustomObject.createTable(myTable, tableData.books);
+
+
+			//add on change event to the textbox
+			var myInput = document.getElementById('filterTable');
+			myInput.addEventListener('keyup', function(){
+				var text = myInput.value;
+				var newData = tableData.books.map(function(elem){
+
+					if((elem.name).indexOf(text) != -1) {
+						return true;
+					} else {
+						return false;
+					}
+				});
+			console.log(newData);
+
+			});
+
+		}
+		//fetch data from the REST API
+		var tableData = {
+						    'books' : [
+						        {
+						            'id' : 1,
+						            'name' : 'Da Vinci Code',
+						            'author' : 'Dan Brown',
+						            'published_year' : 2005
+						        },
+						        {
+						            'id' : 2,
+						            'name' : 'Digital Fortress',
+						            'author' : 'Dan Browny',
+						            'published_year' : 1990
+						        },
+						        {
+						            'id' : 3,
+						            'name' : 'Catcher in the Rye',
+						            'author' : 'J D Salinger',
+						            'published_year' : 1998
+						        }
+							]
+						};
+
+
+
+
+
+		var myCustomObject = {
+
+			//create the dynamic table
+			createTable: function(myTable,tableData) {
+				for (var i = 0; i < tableData.length; i++) {
+					var childData = tableData[i];
+
+					if(i === 0){
+					myCustomObject.createTableHeaders(myTable, Object.keys(childData)) // first create table headers
+					}
+
+					var row = myTable.insertRow();
+					var dummytbody = document.getElementById("tableBody");
+					var dummyrow = dummytbody.insertRow();
+					//shift childData;
+					Object.keys(childData).forEach(function(k){
+						var cell = row.insertCell();
+						var dummycell = dummyrow.insertCell();
+						cell.appendChild(document.createTextNode(childData[k]));
+						dummycell.appendChild(document.createTextNode(childData[k]));
+					});
+
+				}
+			},
+
+			//create dynamic table headers
+			createTableHeaders : function(myTable, keys) {
+				var row = myTable.insertRow();
+				for (var i = 0; i < keys.length; i++){
+					var cell = row.insertCell();
+					cell.appendChild(document.createTextNode(keys[i]));
+				}
+			},
+
+			//sort the table as per the clicked table header
+			sort_table : function(tbody, col, asc){
+				var rows = tbody.rows, rlen = rows.length, arr = new Array(), i, j, cells, clen;
+				// fill the array with values from the table
+				for(var i = 0; i < rlen; i++){
+					cells = rows[i].cells;
+					clen = cells.length;
+					arr[i] = new Array();
+
+					for(var j = 0; j < clen; j++){
+						arr[i][j] = cells[j].innerHTML;
+					}
+				}
+				// sort the array by the specified column number (col) and order (asc)
+				arr.sort(function(a, b){
+				return (a[col] == b[col]) ? 0 : ((a[col] > b[col]) ? asc : -1*asc);
+				});
+				for(var i = 0; i < rlen; i++){
+				arr[i] = "<td>"+arr[i].join("</td><td>")+"</td>";
+				}
+				tbody.innerHTML = "<tr>"+arr.join("</tr><tr>")+"</tr>";
+
+			}
+
+
+		};
+
+		</script>
+	</body>
+</html>

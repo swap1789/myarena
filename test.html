@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dummy Table Page</title>
+    <style>
+      table, tr td {
+        border: 1px solid #333;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      tr, td {
+        text-transform: capitalize;
+        padding: 10px;
+      }
+      input {
+        padding: 5px;
+        display: inline-block;
+        margin-bottom: 15px;
+        outline: none;
+      }
+    </style>
+    <script>
+    //fetch data from the REST API
+    var tableData = {
+                'books' : [
+                    {
+                        'id' : 1,
+                        'name' : 'Da Vinci Code',
+                        'author' : 'Dan Brown',
+                        'published_year' : 2005
+                    },
+                    {
+                        'id' : 2,
+                        'name' : 'Digital Fortress',
+                        'author' : 'Dan Browny',
+                        'published_year' : 1990
+                    },
+                    {
+                        'id' : 3,
+                        'name' : 'Catcher in the Rye',
+                        'author' : 'J D Salinger',
+                        'published_year' : 1998
+                    }
+                  ]
+                };
+    window.onload = function() {
+      var elemTable = document.createElement('table');
+      document.getElementById('wrapper').appendChild(elemTable);
+      oTableObject.createTable(elemTable, tableData.books);
+
+      var books = tableData.books;
+      var filterTable = document.getElementById('filterData');
+
+      filterTable.addEventListener('keyup', function() {
+          var text = document.getElementById('filterData').value;
+          var tempArr = [];
+          var filteredData = books.filter(function(elem) {
+            var comparetext = elem.name;
+            if (comparetext.indexOf(text) !== -1) {
+              tempArr.push(elem)
+            }
+          });
+          console.log(tempArr);
+      });
+    };
+
+    var oTableObject = {
+
+      createTable : function(myTable, tableData) {
+        for (var i = 0; i < tableData.length; i++) {
+					var childData = tableData[i];
+          if(i === 0){
+					  this.createTableHeaders(myTable, Object.keys(childData)) // first create table headers
+					}
+
+          //create table body and insert data
+          var row = myTable.insertRow();
+          Object.keys(childData).forEach(function(k) {
+            var cell = row.insertCell();
+            cell.appendChild(document.createTextNode(childData[k]));
+          });
+        }
+      },
+
+      //create dynamic table headers
+      createTableHeaders : function(myTable, keys) {
+        var row = myTable.insertRow();
+        for (var i = 0; i < keys.length; i++){
+          var cell = row.insertCell();
+          cell.appendChild(document.createTextNode(keys[i]));
+        }
+      }
+
+    }
+
+</script>
+  </head>
+
+  <body>
+      <div id='wrapper'>
+        <input id='filterData' placeholder="Search" />
+      </div>
+  </body>
+</html>
